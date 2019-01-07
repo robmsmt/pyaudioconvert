@@ -7,3 +7,7 @@ Simple utility to convert audio from one form to another (via sox). We will use 
  0. At least py3x
  1. Have sox installed 
  
+ 
+## Install
+ 0. `pip install pyaudioconvert`
+ 
