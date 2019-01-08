@@ -92,10 +92,15 @@ def _get_safe_temp_file():
 
     return full_temp_path
 
+def _get_audio_sample_rate(wav_file):
+    rate, _ = scipy.io.wavfile.read(wav_file)
+    return rate
+
 
 def convert_wav_to_16bit_mono(old_wav_path, new_wav_path, sr=16000, overwrite_existing=True):
 
-    temp_file_is_old_wav = False
+    temp_file1_notused = False
+    temp_file2_notused = False
 
     # 0. CHECK - validate audiofile
     try:
@@ -106,34 +111,40 @@ def convert_wav_to_16bit_mono(old_wav_path, new_wav_path, sr=16000, overwrite_ex
     # 1. CHECK - is24bit?
     if _is_24bit_audio(old_wav_path):
         # if 24bit we must convert to 16bit
-
         # create new safe temp file
         full_temp_path = _get_safe_temp_file()
-
         # use sox to convert
         subprocess.call(["sox", old_wav_path, '--encoding=signed-integer', '--bits=16', '--type=wav', full_temp_path], stderr=subprocess.STDOUT)
 
     else:
         # 16bit
-        temp_file_is_old_wav = True
+        temp_file1_notused = True
         full_temp_path = old_wav_path
 
-    # 2. get mono Audio only
-    mono_audio = _get_mono_audio_only(full_temp_path)
+    # 2. SET SAMPLE RATE
+    if _get_audio_sample_rate(full_temp_path) != sr:
+        final_full_temp_path = _get_safe_temp_file()
+        subprocess.call(["sox", full_temp_path, '--type=wav', '--rate={}'.format(sr), final_full_temp_path], stderr=subprocess.STDOUT)
+    else:
+        temp_file2_notused = True
+        final_full_temp_path = full_temp_path
 
-    # 3. Save audio (16k or set SR)
+    # 3. get mono Audio only & save
+    mono_audio = _get_mono_audio_only(final_full_temp_path)
+
     if os.path.isfile(new_wav_path):
-
         if overwrite_existing:
             scipy.io.wavfile.write(new_wav_path, sr, mono_audio)
         else:
             raise(OverwriteFileError)
-
     else:
         scipy.io.wavfile.write(new_wav_path, sr, mono_audio)
 
-    # cleanup temp
-    if temp_file_is_old_wav == False:
+    # cleanup temp & finaltemp
+    if temp_file1_notused == False:
         os.remove(full_temp_path)
+
+    if temp_file2_notused == False:
+        os.remove(final_full_temp_path)
 
     return new_wav_path
