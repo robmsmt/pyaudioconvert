@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pyaudioconvert",
-    version="0.0.2",
+    version="0.0.3",
     author="Rob Smith",
     author_email="robmsmt@gmail.com",
     description="A small package to convert audio files",
