@@ -1,6 +1,8 @@
 name = "pyaudioconvert"
 
 import os, subprocess, tempfile, uuid
+from os import listdir
+from os.path import isfile, join
 import scipy
 import scipy.io.wavfile as wav
 
@@ -95,6 +97,25 @@ def _get_safe_temp_file():
 def _get_audio_sample_rate(wav_file):
     rate, _ = scipy.io.wavfile.read(wav_file)
     return rate
+
+def convert_all_wavs_in_folder(path_location='.', overwrite_existing=True):
+
+    wav_files = [f for f in listdir(path_location) if f.endswith('wav')]
+
+    for wav in wav_files:
+        print(wav)
+
+        new_file_path = wav[:-4] + "_16k.wav"
+
+        if os.path.isfile(new_file_path):
+
+            if overwrite_existing:
+                print(convert_wav_to_16bit_mono(wav, new_file_path))
+            else:
+                raise OverwriteFileError
+
+        else:
+            print(convert_wav_to_16bit_mono(wav, new_file_path))
 
 
 def convert_wav_to_16bit_mono(old_wav_path, new_wav_path, sr=16000, overwrite_existing=True):
