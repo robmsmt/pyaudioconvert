@@ -12,3 +12,49 @@ Simple utility to convert audio from one form to another (via sox). We will use 
  0. `pip install pyaudioconvert`
  
 
+
+## Example Usage
+
+### Converting Single WAVs
+```python
+#let's start with a 24bit 48kz audio wav 2 channel wav
+>>> soxi example_24bit_48k_2ch.wav 
+
+Input File     : 'example_24bit_48k_2ch.wav'
+Channels       : 2
+Sample Rate    : 48000
+Precision      : 24-bit
+Duration       : 00:00:04.00 = 192000 samples ~ 300 CDDA sectors
+File Size      : 1.15M
+Bit Rate       : 2.30M
+Sample Encoding: 24-bit Signed Integer PCM
+
+#we prefer 16-bit 16kz mono for our systems, let's use python
+>>> import pyaudioconvert as pac
+>>> pac.convert_wav_to_16bit_mono('example_24bit_48k_2ch.wav', 'example_16bit_16k_1ch.wav')
+Out[2]: 'example_16bit_16k_1ch.wav'
+
+#let's check the new file...
+>>> soxi example_16bit_16k_1ch.wav 
+
+Input File     : 'example_16bit_16k_1ch.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:04.00 = 64000 samples ~ 300 CDDA sectors
+File Size      : 128k
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+
+```
+
+
+### Converting Directory of WAVs
+
+Maybe I have a whole folder of WAVS that need converting... this will create a _16k.wav version.
+
+```python
+
+
+
+```
