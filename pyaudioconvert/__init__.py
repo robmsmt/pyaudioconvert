@@ -98,27 +98,52 @@ def _get_audio_sample_rate(wav_file):
     rate, _ = scipy.io.wavfile.read(wav_file)
     return rate
 
-def convert_all_wavs_in_folder(path_location='.', overwrite_existing=True):
+def convert_all_wavs_in_folder(path_location='.', sr=16000, overwrite_existing=True):
+
+    '''
+
+    :param path_location: If no path is given it will assume current directory
+    :param sr:  SR defaults to 16k
+    :param overwrite_existing: Will overwrite existing wavs by default (unless turned off)
+    :return:
+    '''
 
     wav_files = [f for f in listdir(path_location) if f.endswith('wav')]
+    sr_suffix = str(sr)[0:2]
 
     for wav in wav_files:
         print(wav)
 
-        new_file_path = wav[:-4] + "_16k.wav"
+        new_file_path = wav[:-4] + "_{}k.wav".format(sr_suffix)
 
         if os.path.isfile(new_file_path):
 
             if overwrite_existing:
-                print(convert_wav_to_16bit_mono(wav, new_file_path))
+                print(convert_wav_to_16bit_mono(wav, new_file_path, sr=sr))
             else:
                 raise OverwriteFileError
 
         else:
-            print(convert_wav_to_16bit_mono(wav, new_file_path))
+            print(convert_wav_to_16bit_mono(wav, new_file_path, sr=sr))
 
 
 def convert_wav_to_16bit_mono(old_wav_path, new_wav_path, sr=16000, overwrite_existing=True):
+
+    '''
+
+    :param old_wav_path: The original wav file that needs converting
+    :param new_wav_path: The new path or name of the wav to be used
+    :param sr: The sample rate (default is 16k)
+    :param overwrite_existing: Will overwrite existing wavs by default (unless turned off)
+    :return: Returns the name of the new wav on successful creation
+
+    Example usage:
+    >>> import pyaudioconvert as pac
+    >>> pac.convert_wav_to_16bit_mono('example_24bit_48k_2ch.wav', 'example_16bit_16k_1ch.wav')
+    Out[2]: 'example_16bit_16k_1ch.wav'
+
+    '''
+
 
     temp_file1_notused = False
     temp_file2_notused = False
