@@ -68,7 +68,7 @@ def _is_24bit_audio(audio_file_path):
         return True
 
 
-def _get_mono_audio_only(audio_file_path):
+def _get_mono_audio_only(audio_file_path, selected_channel=0):
     rate, data = scipy.io.wavfile.read(audio_file_path)
     try:
         nchannels = data.shape[1]
@@ -76,7 +76,7 @@ def _get_mono_audio_only(audio_file_path):
         nchannels = 1
 
     if nchannels != 1:
-        return data[:, 0]
+        return data[:, selected_channel]
 
     return data
 
@@ -98,7 +98,7 @@ def _get_audio_sample_rate(wav_file):
     rate, _ = scipy.io.wavfile.read(wav_file)
     return rate
 
-def convert_all_wavs_in_folder(path_location='.', sr=16000, overwrite_existing=True):
+def convert_all_wavs_in_folder(path_location='.', selected_channel=0, sr=16000, overwrite_existing=True):
 
     '''
 
@@ -114,20 +114,20 @@ def convert_all_wavs_in_folder(path_location='.', sr=16000, overwrite_existing=T
     for wav in wav_files:
         print(wav)
 
-        new_file_path = wav[:-4] + "_{}k.wav".format(sr_suffix)
+        new_file_path = wav[:-4] + "ch{}_{}k.wav".format(selected_channel, sr_suffix)
 
         if os.path.isfile(new_file_path):
 
             if overwrite_existing:
-                print(convert_wav_to_16bit_mono(wav, new_file_path, sr=sr))
+                print(convert_wav_to_16bit_mono(wav, new_file_path, selected_channel, sr=sr))
             else:
                 raise OverwriteFileError
 
         else:
-            print(convert_wav_to_16bit_mono(wav, new_file_path, sr=sr))
+            print(convert_wav_to_16bit_mono(wav, new_file_path, selected_channel, sr=sr))
 
 
-def convert_wav_to_16bit_mono(old_wav_path, new_wav_path, sr=16000, overwrite_existing=True):
+def convert_wav_to_16bit_mono(old_wav_path, new_wav_path, selected_channel=0, sr=16000, overwrite_existing=True):
 
     '''
 
@@ -176,7 +176,7 @@ def convert_wav_to_16bit_mono(old_wav_path, new_wav_path, sr=16000, overwrite_ex
         final_full_temp_path = full_temp_path
 
     # 3. get mono Audio only & save
-    mono_audio = _get_mono_audio_only(final_full_temp_path)
+    mono_audio = _get_mono_audio_only(final_full_temp_path, selected_channel)
 
     if os.path.isfile(new_wav_path):
         if overwrite_existing:
